@@ -5,7 +5,7 @@ BME680 is a gas sensor produced by Bosch. It claims that it can give IAQ(indoor 
 
 ### How BME680 works
 
-### bVOC, s-IAQ as a function of CO2 equivalents
+### bVOC and s-IAQ as a function of CO2 equivalents
 
 ### How CO2 equivalents is calculated
 
