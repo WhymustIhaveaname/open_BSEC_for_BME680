@@ -10,7 +10,13 @@ R/R_0 = N_d/e_S
 
 e_S = N_d exp{-(1/6)(a/L_D)^2 - p}
 
-Here e_S is the surface electron concentration and L_D is the Debye length. R0 is the sensor resistances when there is no reducing gases. a	is Particle radius. When sensor is made, N_d, a, L_D and R_0 are fixed, while p is dependent on the actual gaseous conditions.
+Here e_S is the surface electron concentration and L_D is the Debye length. R0 is the sensor resistances when there is no reducing gases. a	is Particle radius. When sensor is made, N_d, a, L_D and R_0 are fixed, while p is dependent on the actual gaseous conditions. So the equivalent reducing gas pressure reads
+
+\delta p = C (A + B/T - ln(R))
+
+where B and C are constants of the sensor, and A needs to be calibrated based on the history after power on. Readers will soon find that how A is calibrated by BSEC is the main issue. 
+
+As discussed above, BME680 is enough for demand controlled ventilation(DCV) while it cannot give exact value of any of IAQ or CO2 equivalents.
 
 ### bVOC and s-IAQ as a function of CO2 equivalents
 
