@@ -25,6 +25,7 @@ def log(msg, l=1, end="\n", logfile=None, fileonly=False):
 import re
 
 def get_log_lines(filename):
+    log('reading logs from %s...'%(filename))
     p=re.compile("b'([\\-0-9,\\.\\s]+?)\\\\r\\\\n'")
     all_lines=[]
     f=open(filename)
@@ -40,7 +41,21 @@ def get_log_lines(filename):
     f.close()
     return all_lines
 
+def get_bsec_a_from_log(filename):
+    BSEC_B=3372
+    BSEC_C=4634
+    BSEC_PPM0=500.0
+    K_SHIFT=273.15
+    all_lines=get_log_lines(filename)
+    log('generating bsec_a shld and acct...')
+    bsec_a_shld=[];bsec_a_acct=[]
+    for l in all_lines[:]:
+        bsec_a_shld.append(BSEC_PPM0/BSEC_C - BSEC_B/(l[1]+K_SHIFT) + math.log(l[5]))
+        bsec_a_acct.append(l[8]/BSEC_C - BSEC_B/(l[1]+K_SHIFT) + math.log(l[5]))
+    return bsec_a_shld,bsec_a_acct
+
 def gen_fake_a_twolr(bseca_shld,lr1=0.0018,lr2=0.00012):
+    log('generating bsec_a_twolr...')
     bseca_mein=bseca_shld[0:100]
     bseca=sum(bseca_shld[50:100])/50
     for i in bseca_shld[100:]:
@@ -52,20 +67,9 @@ def gen_fake_a_twolr(bseca_shld,lr1=0.0018,lr2=0.00012):
     return bseca_mein
 
 def plot_bsec_a(filename):
-    BSEC_B=3372
-    BSEC_C=4634
-    BSEC_PPM0=500.0
-    K_SHIFT=273.15
-    log('reading logs...')
-    all_lines=get_log_lines(filename)
-    log('generating bsec_a shld and acct')
-    bsec_a_shld=[];bsec_a_acct=[];bsec_a_mein=[]
-    for l in all_lines[:]:
-        bsec_a_shld.append(BSEC_PPM0/BSEC_C - BSEC_B/(l[1]+K_SHIFT) + math.log(l[5]))
-        bsec_a_acct.append(l[8]/BSEC_C - BSEC_B/(l[1]+K_SHIFT) + math.log(l[5]))
-        #bsec_a_mein.append(l[9]/BSEC_C - BSEC_B/(l[1]+K_SHIFT) + math.log(l[5]))
-    log('drawing')
-
+    bsec_a_shld,bsec_a_acct=get_bsec_a_from_log(filename)
+    bsec_a_twolr=gen_fake_a_twolr(bsec_a_shld)
+    log('drawing...')
     import matplotlib.pyplot as plt
     from matplotlib.ticker import AutoMinorLocator,MultipleLocator
 
@@ -77,10 +81,8 @@ def plot_bsec_a(filename):
     
     ax1.plot(ts,bsec_a_shld,'.',markersize=mks,label="should")
     ax1.plot(ts,bsec_a_acct,'.',markersize=mks,label="actually")
-    ax1.plot(ts,gen_fake_a_twolr(bsec_a_shld),'.',markersize=mks,label="mein_twolr")
-    
-    #ax1.set_xlim(200,400)
-    #ax1.set_ylim(0.4,1.4)
+    ax1.plot(ts,bsec_a_twolr,'.',markersize=mks,label="mein_twolr")
+
     ax1.xaxis.set_minor_locator(AutoMinorLocator(5))
     ax1.yaxis.set_minor_locator(AutoMinorLocator(2))
     ax1.grid(True,which='both',axis='x')
@@ -91,5 +93,5 @@ def plot_bsec_a(filename):
     plt.show()
 
 if __name__ == '__main__':
-    log(len(get_log_lines('iaqdata.0522')))
-    #plot_bsec_a('iaqdata.05082')
+    #log(len(get_log_lines('iaqdata.0522')))
+    plot_bsec_a('iaqdata.05082')

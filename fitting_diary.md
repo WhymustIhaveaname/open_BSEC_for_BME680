@@ -24,8 +24,8 @@ I am going to try this using a neural network. To this end, I will first test NN
 
 Before beginning fitting data with NN, the errors of classical two learning rate are measured as following. Iaqdata 05082, 0520, 0522 are chosen as suitable train or test files, because of their size and data range.
 
-item|size|number of datas|two lr err|two lr abs err|
-:-:|:-:|:-:|:-:|:-:
-05082|1.1M|104404|
-0520 |2.4M|149084|
-0522 |1.8M|61374 |
+file|size|number of datas|two lr err|two lr abs err|
+:--:|:--:|:-------------:|:--------:|:------------:
+05082|1.1M|104404|0.002708|0.03967
+0520 |2.4M|149084|0.006010|0.06524
+0522 |1.8M|61374 |0.007131|0.06880
