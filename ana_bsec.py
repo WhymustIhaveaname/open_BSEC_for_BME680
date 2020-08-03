@@ -91,4 +91,5 @@ def plot_bsec_a(filename):
     plt.show()
 
 if __name__ == '__main__':
-    plot_bsec_a('iaqdata.05082')
+    log(len(get_log_lines('iaqdata.0522')))
+    #plot_bsec_a('iaqdata.05082')
