@@ -24,12 +24,14 @@ def log(msg, l=1, end="\n", logfile=None, fileonly=False):
 
 import re
 
-def get_log_lines(filename):
+def get_log_lines(filename,limit=1e15):
     log('reading logs from %s...'%(filename))
     p=re.compile("b'([\\-0-9,\\.\\s]+?)\\\\r\\\\n'")
     all_lines=[]
     f=open(filename)
+    ax=0
     for line in f:
+        ax+=1
         temp=None
         temp=p.search(line)
         if not temp:
@@ -38,16 +40,18 @@ def get_log_lines(filename):
         if(len(all_lines[-1])<5):
             all_lines.pop()
             continue
+        if ax>limit:
+            break
     f.close()
     return all_lines
 
-def get_bsec_a_from_log(filename):
+def get_bsec_a_from_log(filename,limit=1e15):
     BSEC_B=3372
     BSEC_C=4634
     BSEC_PPM0=500.0
     K_SHIFT=273.15
-    all_lines=get_log_lines(filename)
-    log('generating bsec_a shld and acct...')
+    all_lines=get_log_lines(filename,limit=limit)
+    #log('generating bsec_a shld and acct...')
     bsec_a_shld=[];bsec_a_acct=[]
     for l in all_lines[:]:
         bsec_a_shld.append(BSEC_PPM0/BSEC_C - BSEC_B/(l[1]+K_SHIFT) + math.log(l[5]))

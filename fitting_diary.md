@@ -24,8 +24,16 @@ I am going to try this using a neural network. To this end, I will first test NN
 
 Before beginning fitting data with NN, the errors of classical two learning rate are measured as following. Iaqdata 05082, 0520, 0522 are chosen as suitable train or test files, because of their size and data range.
 
-file|size|number of datas|two lr err|two lr abs err|
-:--:|:--:|:-------------:|:--------:|:------------:
-05082|1.1M|104404|0.002708|0.03967
-0520 |2.4M|149084|0.006010|0.06524
-0522 |1.8M|61374 |0.007131|0.06880
+file|size|number of datas|two lr err|two lr abs err|shld err|shld abs err|
+:--:|:--:|:-------------:|:--------:|:------------:|:------:|:----------:
+05082|1.1M|104404|0.002708|0.03967|0.02712|0.1041
+0520 |2.4M|149084|0.006010|0.06524|0.03664|0.1533
+0522 |1.8M|61374 |0.007131|0.06880|0.04630|0.1777
+
+### 20200804
+
+I will first try RNN. If there is enough time, I will also try NEAT(NeuroEvolution of Augmenting Topologies).
+
+A no hidden layer, fully connected, two h, no activation RNN is implemented([(3,2),(3,1)],12paras). Trained with 0520 after 100 iters, the err is optimized to 0.01478. But tested with 0522, the err is 1.1018. Also, the RNN using nn.Module is extremely slow, almost 1min each iter. I should optimize it first. Use `rnn.i2h.weight.data=` to manually set the values.  
+
+Optimize the programme using nn.RNN. It becomes faster also still with some problems, which is that I have to split the 140000 sequence into 14 10000-sequence to make it faster. Anyway, it starts to train. Construct a naive, one linear layer, two hidden parameter RNN, train it with 0520 and test with 0522. It reached 0.009591(train) and 0.010034(test) after 100 iters. Although this is still worse than my genius two lr, it is better than straightly using shld.
