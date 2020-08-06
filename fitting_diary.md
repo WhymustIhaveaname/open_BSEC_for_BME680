@@ -37,3 +37,6 @@ I will first try RNN. If there is enough time, I will also try NEAT(NeuroEvoluti
 A no hidden layer, fully connected, two h, no activation RNN is implemented([(3,2),(3,1)],12paras). Trained with 0520 after 100 iters, the err is optimized to 0.01478. But tested with 0522, the err is 1.1018. Also, the RNN using nn.Module is extremely slow, almost 1min each iter. I should optimize it first. Use `rnn.i2h.weight.data=` to manually set the values.  
 
 Optimize the programme using nn.RNN. It becomes faster also still with some problems, which is that I have to split the 140000 sequence into 14 10000-sequence to make it faster. Anyway, it starts to train. Construct a naive, one linear layer, two hidden parameter RNN, train it with 0520 and test with 0522. It reached 0.009591(train) and 0.010034(test) after 100 iters. Although this is still worse than my genius two lr, it is better than straightly using shld.
+
+Increase hidden parameter number to 8, 0.010857 and 0.009507 is achieved after 100 iters, which means that the weakness is the topology of output layer, not number of hidden paras. Reset num_h to 2, add another square linear layer and a relu layer. It reaches 0.009610 0.010049 after 50 iters. Increase num_h to 4, keep topology unchanged. The result get worse to 0.015646 0.013364. Increase num_h to 8, get 0.011392 0.009912. Change learnrate, no improve.
+

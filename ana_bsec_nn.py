@@ -42,16 +42,22 @@ class BSEC_RNN_OLD(nn.Module):
         return "%s %s %s"%(self.__class__.__name__,stru,num_paras)
 
 class BSEC_RNN(nn.Module):
-    def __init__(self,input_size=1,hidden_size=2,output_size=1):
+    def __init__(self,hidden_size,input_size=1,output_size=1):
         super(BSEC_RNN,self).__init__()
         self.hidden_size=hidden_size
         self.rnn=nn.RNN(input_size,hidden_size,batch_first=True)
-        self.fc=nn.Linear(hidden_size+input_size,output_size)
+        self.fc1=nn.Linear(hidden_size+input_size,32)
+        self.fc2=nn.Linear(32,16)
+        self.fc3=nn.Linear(16,8)
+        self.fc4=nn.Linear(8,output_size)
     
     def forward(self,x):
         h0=torch.zeros(1,x.size(0),self.hidden_size)
         hen,h_n=self.rnn(x,h0)
-        x=self.fc(torch.cat((x,hen),dim=2))
+        x=F.relu(self.fc1(torch.cat((x,hen),dim=2)))
+        x=F.relu(self.fc2(x))
+        x=F.relu(self.fc3(x))
+        x=self.fc4(x)
         return x
 
 def try_rnn():
@@ -87,21 +93,24 @@ def load_data(filename,seq_len=10000):
     return bsec_a_shld,bsec_a_acct
 
 def train():
-    rnn=BSEC_RNN()
-    anatomise_nn(rnn)
+    rnn=BSEC_RNN(8)
+    log(rnn)
+    #anatomise_nn(rnn)
     train_shld,train_acct=load_data('iaqdata.0520')
     test_shld,test_acct=load_data('iaqdata.0522')
     criterion=nn.MSELoss()
-    optimizer=optim.SGD(rnn.parameters(),lr=0.01,momentum=0)
+    optimizer=optim.SGD(rnn.parameters(),lr=0.1,momentum=0)
     optimizer.zero_grad()
+    scheduler=torch.optim.lr_scheduler.MultiStepLR(optimizer,[100,],gamma=0.2)
     log("begin trainging: %f, %f"%(test_err(rnn,train_shld,train_acct),test_err(rnn,test_shld,test_acct)))
-    for epoch in range(101):
+    for epoch in range(151):
         output=rnn(train_shld)
         loss=criterion(output,train_acct)
         #log('begin backward')
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
+        scheduler.step()
         if epoch%5==0:
             log("%3d: %f %f"%(epoch,loss.item(),test_err(rnn,test_shld,test_acct)))
     anatomise_nn(rnn,structure_flag=False)
